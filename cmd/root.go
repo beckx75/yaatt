@@ -6,11 +6,14 @@ package cmd
 import (
 	"os"
 
+	"beckx.online/yaatt/yaatt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+var yd *yaatt.YaattData
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,8 +36,8 @@ func Execute() {
 }
 
 func init() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Caller().Logger()
 	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	//log.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Caller()
 	log.Info().Msg("initialised root command... starting yaatt")
 
 	userhome, _ := os.UserHomeDir()

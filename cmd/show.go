@@ -5,17 +5,11 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
-	// "beckx.online/yaatt"
 	"beckx.online/yaatt/yaatt"
-	"github.com/go-flac/flacvorbis/v2"
-	"github.com/go-flac/go-flac/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
-
-var yd *yaatt.YaattData
 
 // showCmd represents the show command
 var showCmd = &cobra.Command{
@@ -26,28 +20,16 @@ var showCmd = &cobra.Command{
 'show' will search for mp3 and flac files.
 For each audiofile audio-metadata will be read and printed out`,
 	Run: func(cmd *cobra.Command, args []string) {
-		files, err := yaatt.GetAudiofiles(args, []string{".mp3", ".flac"})
+		var err error
+		yd, err = yaatt.NewYaattData(args, ".")
 		if err != nil {
-			log.Error().Msg(err.Error())
+			log.Error().Msgf("%v", err)
 			return
 		}
-		fmt.Println(files)
-		f, err := flac.ParseFile(files[0])
-		if err != nil {
-			panic(err)
-		}
-		var ddd *flacvorbis.MetaDataBlockVorbisComment
-		for idx, meta := range f.Meta {
-			if meta.Type == flac.VorbisComment {
-				fmt.Println(idx)
-				ddd, _ = flacvorbis.ParseFromMetaDataBlock(*meta)
-				for _, cmt := range ddd.Comments {
-					fmt.Println(cmt)
-					keyVal := strings.Split(cmt, "=")
-					fmt.Println(keyVal[0], ":", keyVal[1])
-				}
-			}
-		}
+		fmt.Printf("%v\n", yd.Tagmap.Id323ToYatt)
+		fmt.Println("Got Audiofiles:", len(yd.Files))
+
+		fmt.Println(yd.PrintMetadata())
 	},
 }
 

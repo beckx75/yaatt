@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"beckx.online/butils/fileutils"
 	"github.com/rs/zerolog/log"
@@ -16,12 +17,47 @@ type TagMap struct {
 	VorbisToYaat map[string]string
 }
 
+type YaattData struct {
+	Tagmap *TagMap
+
+	Files     []string
+	MetaDatas map[string]*MetaData
+}
+
+func NewYaattData(args []string, confpath string) (*YaattData, error) {
+	confpath = confpath + "/tagdef.csv"
+	tm, err := newTagMap(confpath)
+	if err != nil {
+		return nil, err
+	}
+	yd := &YaattData{
+		Tagmap:    tm,
+		MetaDatas: make(map[string]*MetaData),
+	}
+
+	yd.Files, err = GetAudiofiles(args, []string{".mp3", ".flac"})
+	if err != nil {
+		return yd, err
+	}
+
+	for i, fp := range yd.Files {
+		md, err := ReadMetadata(fp, *yd.Tagmap)
+		if err != nil {
+			return yd, err
+		}
+		fmt.Println("Read file", i+1, fp)
+		yd.MetaDatas[fp] = md
+	}
+	return yd, nil
+}
+
 func newTagMap(fp string) (*TagMap, error) {
 	// TODO check csv-cols; check csv rows, should be nine
 	f, err := os.Open(fp)
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	c := csv.NewReader(f)
 	c.Comma = ';'
 	rec, err := c.ReadAll()
@@ -46,17 +82,6 @@ func newTagMap(fp string) (*TagMap, error) {
 	return tm, nil
 }
 
-type YaattData struct {
-	Tagmap *TagMap
-}
-
-func NewYaattData(args []string, confpath string) (*YaattData, error) {
-
-	yd := &YaattData{}
-
-	return yd, nil
-}
-
 func GetAudiofiles(args []string, pattern []string) ([]string, error) {
 	log.Info().Msg("looking for some files....")
 	_, files, err := fileutils.GetFiles(args, pattern)
@@ -64,4 +89,24 @@ func GetAudiofiles(args []string, pattern []string) ([]string, error) {
 		return nil, err
 	}
 	return files, nil
+}
+
+func (yd YaattData) PrintMetadata() string {
+	txt := ""
+	for _, fp := range yd.Files {
+		txt = txt + filepath.Base(fp) + " Metadata:\n"
+		md, ok := yd.MetaDatas[fp]
+		if !ok {
+			continue
+		}
+		for _, k := range md.TextTagIndex {
+			val, ok := md.TextTags[k]
+			if !ok {
+				txt = txt + "\t" + k + ":\n"
+			} else {
+				txt = txt + "\t" + k + ": " + val.Value + "\n"
+			}
+		}
+	}
+	return txt
 }

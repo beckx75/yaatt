@@ -1,29 +1,25 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"os"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "yaatt",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "yat again another tag tool",
+	Long: `yaatt - my seventh attemp for my own tool to tag audiofiles...
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+hope this one is my last attemp ;)
+`,
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
@@ -37,15 +33,29 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	//log.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Caller()
+	log.Info().Msg("initialised root command... starting yaatt")
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.yaatt.yaml)")
+	userhome, _ := os.UserHomeDir()
+	viper.AddConfigPath(".")
+	viper.AddConfigPath(userhome + "/yaatt/")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Error().Msgf("%v", err)
+	}
+	switch viper.Get("App.loglevel") {
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "info":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	default:
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	}
+	log.Debug().Msg("Is this debugging!?")
+
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-

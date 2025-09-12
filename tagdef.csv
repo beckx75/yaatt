@@ -1,0 +1,10 @@
+yaatt;id3v23;vorbiscomment
+albartist;TPE2;ALBUMARTIST
+album;TABL;ALBUM
+artist;TPE1;ARTIST
+title;TIT2;TITLE
+discnum;TPOS;DISCNUMBER
+tracknum;TRCK;TRACKNUMBER
+year;TYER;DATE
+genre;TCON;GENRE
+comment;COMM;COMMENT

@@ -56,8 +56,8 @@ func InitGui(args []string) {
 	})
 
 	mainbox := container.NewBorder(
-		cntFiles, btnQuit, nil, nil,
-		widget.NewLabel("coming soon..."),
+		nil, btnQuit, nil, nil,
+		cntFiles,
 	)
 
 	// ui.win.SetOnDropped(

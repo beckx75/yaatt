@@ -1,8 +1,6 @@
 package gui
 
 import (
-	"fmt"
-
 	"beckx.online/yaatt/yaatt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -30,11 +28,6 @@ func InitGui(args []string) {
 		ui.yd, err = yaatt.NewYaattData(args, ".")
 		if err != nil {
 			dialog.ShowError(err, ui.win)
-		} else {
-			dialog.ShowInformation("args success",
-				fmt.Sprintf("read in %d audiofiles", len(ui.yd.MetaDatas)),
-				ui.win,
-			)
 		}
 	}
 
@@ -50,6 +43,13 @@ func InitGui(args []string) {
 	// )
 
 	cntFiles := ui.initUiFiles()
+	cntTagging := ui.initUiTagging()
+
+	cntContent := container.NewBorder(nil, nil, nil, nil,
+		container.NewGridWithRows(2,
+			cntFiles, cntTagging,
+		),
+	)
 
 	btnQuit := widget.NewButtonWithIcon("i'm done...", theme.HomeIcon(), func() {
 		ui.app.Quit()
@@ -57,7 +57,7 @@ func InitGui(args []string) {
 
 	mainbox := container.NewBorder(
 		nil, btnQuit, nil, nil,
-		cntFiles,
+		cntContent,
 	)
 
 	// ui.win.SetOnDropped(

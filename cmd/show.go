@@ -28,7 +28,7 @@ For each audiofile audio-metadata will be read and printed out`,
 		fmt.Printf("%v\n", yd.Tagmap.Id323ToYatt)
 		fmt.Println("Got Audiofiles:", len(yd.Files))
 
-		// fmt.Println(yd.PrintMetadata())
+		fmt.Println(yd.PrintMetadata())
 	},
 }
 

@@ -103,11 +103,13 @@ func (yd YaattData) PrintMetadata() string {
 			continue
 		}
 		for _, k := range md.TextTagIndex {
-			val, ok := md.TextTags[k]
+			texttags, ok := md.TextTags[k]
 			if !ok {
 				txt = txt + "\t" + k + ":\n"
 			} else {
-				txt = txt + "\t" + k + ": " + val.Value + "\n"
+				for _, texttag := range texttags {
+					txt = txt + "\t" + k + ": " + texttag.Value + "\n"
+				}
 			}
 		}
 	}

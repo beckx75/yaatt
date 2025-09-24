@@ -24,7 +24,7 @@ make some collections like "genres", etc`,
 		if err != nil {
 			log.Error().Msgf("%v", err)
 		}
-		("%v\n", yd.Tagmap.Id323ToYatt)
+		fmt.Printf("%v\n", yd.Tagmap.Id323ToYatt)
 		fmt.Println("Got Audiofiles:", len(yd.Files))
 	},
 }

@@ -17,6 +17,7 @@ type TagType uint8
 
 const (
 	TT_UNDEF TagType = iota
+	TT_NOTAG
 	TT_ID3V23
 	TT_VORBIS
 )
@@ -60,8 +61,11 @@ func ReadMetadata(fp string, tm TagMap) (*MetaData, error) {
 		if err != nil {
 			return nil, err
 		}
+	case TT_NOTAG:
+		return nil, fmt.Errorf("file is mp3-file and has no ID3v2x Tag: %s", fp)
 	case TT_UNDEF:
-		return nil, fmt.Errorf("could not read metadata because of unknown TagType :(")
+		return nil, fmt.Errorf("could not read metadata because of unknown TagType in '%s': %v",
+			fp, md.TagType)
 	}
 	if err != nil {
 		panic(err)
@@ -143,7 +147,7 @@ func (md *MetaData) readId3v2Metadata(fp string, tm TagMap) error {
 				}
 			}
 		} else {
-			log.Warn().Msgf("unsupported ID3v2-Frame '%s'", fn)
+			log.Warn().Msgf("unsupported ID3v2-Frame '%s' in '%s'", fn, fp)
 		}
 	}
 	return nil
@@ -158,11 +162,13 @@ func getTagType(fp string) (TagType, error) {
 	var b byte
 	// first 3 bytes of audiofile (ID3, fLa)
 	var fileIdentifier string
+	var bs [3]uint8
 	for i := 0; i < 3; i++ {
 		err = binary.Read(file, binary.BigEndian, &b)
 		if err != nil {
 			return TT_UNDEF, fmt.Errorf("could not get TagType %v", err)
 		}
+		bs[i] = b
 		fileIdentifier = fmt.Sprintf("%s%s", fileIdentifier, string(b))
 	}
 	switch fileIdentifier {
@@ -171,6 +177,10 @@ func getTagType(fp string) (TagType, error) {
 	case "fLa":
 		return TT_VORBIS, nil
 	default:
-		return TT_UNDEF, nil
+		if bs[0] == 0xff && bs[1] == 0xfb {
+			return TT_NOTAG, nil
+		} else {
+			return TT_UNDEF, nil
+		}
 	}
 }

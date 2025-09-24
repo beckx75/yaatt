@@ -38,7 +38,6 @@ func Execute() {
 func init() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Caller().Logger()
 	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-	log.Info().Msg("initialised root command... starting yaatt")
 
 	userhome, _ := os.UserHomeDir()
 	viper.AddConfigPath(".")
@@ -58,6 +57,7 @@ func init() {
 	default:
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	}
+	log.Info().Msg("initialised root command... starting yaatt")
 	log.Debug().Msg("Is this debugging!?")
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")

@@ -24,12 +24,11 @@ For each audiofile audio-metadata will be read and printed out`,
 		yd, err = yaatt.NewYaattData(args, ".")
 		if err != nil {
 			log.Error().Msgf("%v", err)
-			return
 		}
 		fmt.Printf("%v\n", yd.Tagmap.Id323ToYatt)
 		fmt.Println("Got Audiofiles:", len(yd.Files))
 
-		fmt.Println(yd.PrintMetadata())
+		// fmt.Println(yd.PrintMetadata())
 	},
 }
 

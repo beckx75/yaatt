@@ -2,6 +2,7 @@ package yaatt
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -40,15 +41,17 @@ func NewYaattData(args []string, confpath string) (*YaattData, error) {
 		return yd, err
 	}
 
+	var errs error
 	for i, fp := range yd.Files {
 		md, err := ReadMetadata(fp, *yd.Tagmap)
 		if err != nil {
-			return yd, err
+			errs = errors.Join(errs, err)
+		} else {
+			log.Debug().Msgf("Read file", i+1, fp)
+			yd.MetaDatas[fp] = md
 		}
-		fmt.Println("Read file", i+1, fp)
-		yd.MetaDatas[fp] = md
 	}
-	return yd, nil
+	return yd, errs
 }
 
 func newTagMap(fp string) (*TagMap, error) {

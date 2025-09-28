@@ -16,31 +16,29 @@ func (ui *UI) initUiTagging() *fyne.Container {
 		"title", "genre", "comment",
 	}
 
-	fmt.Println(tags)
+	frmItems := []*widget.FormItem{}
 
-	tblTagging := widget.NewList(
-		func() int {
-			return len(tags)
-		},
-		func() fyne.CanvasObject {
-			lblTagname := widget.NewLabel("tmpl")
-			lblTagvalue := widget.NewLabel("tmpl")
-			entValue := widget.NewEntry()
+	frmTags := widget.NewForm()
+	for _, tn := range tags {
+		frmItems = append(frmItems, widget.NewFormItem(tn, widget.NewEntry()))
+	}
+	frmTags.Items = frmItems
 
-			return container.NewGridWithColumns(3,
-				lblTagname, lblTagvalue, entValue,
-			)
-		},
-		func(id widget.ListItemID, obj fyne.CanvasObject) {
-			obj.(*fyne.Container).Objects[0].(*widget.Label).Text = tags[id]
-		},
-	)
-
-	btnTest := widget.NewButton("test", func() {
-
+	btnTest := widget.NewButton("Test...", func() {
+		for _, frmItem := range frmItems {
+			fmt.Println(frmItem.Widget.(*widget.Entry).Text)
+		}
 	})
 
 	return container.NewBorder(nil, btnTest, nil, nil,
-		tblTagging,
+		frmTags,
 	)
+}
+
+func (ui *UI) RefreshTags() {
+	// save current tags
+
+	// clear ui
+	// insert new tags
+	// refresh gui
 }

@@ -49,14 +49,16 @@ func init() {
 	if err != nil {
 		log.Error().Msgf("%v", err)
 	}
+	var loglevel zerolog.Level
 	switch viper.Get("App.loglevel") {
 	case "debug":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		loglevel = zerolog.DebugLevel
 	case "info":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		loglevel = zerolog.InfoLevel
 	default:
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+		loglevel = zerolog.ErrorLevel
 	}
+	zerolog.SetGlobalLevel(loglevel)
 	log.Info().Msg("initialised root command... starting yaatt")
 	log.Debug().Msg("Is this debugging!?")
 

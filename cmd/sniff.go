@@ -5,6 +5,8 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
+	"sort"
 
 	"beckx.online/yaatt/yaatt"
 	"github.com/rs/zerolog/log"
@@ -26,6 +28,19 @@ make some collections like "genres", etc`,
 		}
 		fmt.Printf("%v\n", yd.Tagmap.Id323ToYatt)
 		fmt.Println("Got Audiofiles:", len(yd.Files))
+		ttNames := yd.CollectTextTagNames()
+		fmt.Println("TextTagName Length:", len(ttNames))
+		ttnameList := []string{}
+		for ytname := range ttNames {
+			ttnameList = append(ttnameList, ytname)
+		}
+		sort.Strings(ttnameList)
+		for _, ytname := range ttnameList {
+			fmt.Printf("%s:\t%d\n", ytname, len(ttNames[ytname]))
+			for _, file := range ttNames[ytname] {
+				fmt.Printf("\t%s\n", filepath.Base(file))
+			}
+		}
 	},
 }
 

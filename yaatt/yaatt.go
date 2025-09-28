@@ -22,7 +22,7 @@ type YaattData struct {
 	Tagmap *TagMap
 
 	Files     []string
-	MetaDatas map[string]*MetaData
+	MetaDatas map[string]*MetaData // key: filepath
 }
 
 func NewYaattData(args []string, confpath string) (*YaattData, error) {
@@ -114,4 +114,23 @@ func (yd YaattData) PrintMetadata() string {
 		}
 	}
 	return txt
+}
+
+// CollectTextTagNames walks throu the read in MetaDatas and returns a map
+// containing all found TextTagNames and it's occurence
+func (yd YaattData) CollectTextTagNames() map[string][]string {
+	m := make(map[string][]string)
+
+	for fp, md := range yd.MetaDatas {
+		for ytname := range md.TextTags {
+			_, ok := m[ytname]
+			if ok {
+				m[ytname] = append(m[ytname], fp)
+			} else {
+				m[ytname] = []string{fp}
+			}
+		}
+	}
+
+	return m
 }

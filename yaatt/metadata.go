@@ -172,7 +172,27 @@ func (md *MetaData) readId3v2Metadata(fp string, tm TagMap) error {
 				}
 			}
 		} else if fn == "TXXX" {
-			log.Warn().Msg("TXXX Frames not supported yet :(")
+			for _, fr := range frs {
+				txxx, ok := fr.(id3v2.UserDefinedTextFrame)
+				if !ok {
+					return fmt.Errorf("could not typecast frame to UserDefinedTextframe %s in %s", fn, fp)
+				}
+				tt := &TextTag{
+					OrgName: fn,
+					Value:   txxx.Value,
+					Name:    txxx.Description,
+					Enc:     txxx.Encoding.Name,
+				}
+				yaattName := tt.Name
+				_, ok = md.TextTags[yaattName]
+				if ok {
+					return fmt.Errorf("found non unique TXXX-Frame %s in %s",
+						yaattName, fp)
+				} else {
+					md.TextTags[yaattName] = []*TextTag{tt}
+					md.TextTagIndex = append(md.TextTagIndex, yaattName)
+				}
+			}
 		} else if fn[0] == 'T' {
 			for _, fr := range frs {
 				tf, ok := fr.(id3v2.TextFrame)

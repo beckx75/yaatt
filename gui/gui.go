@@ -2,8 +2,8 @@ package gui
 
 import (
 	"fmt"
-	"path/filepath"
 
+	"beckx.online/butils/fileutils"
 	"beckx.online/yaatt/yaatt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -14,21 +14,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type TheFile struct {
-	Path     string
-	Name     string
-	Dir      string
-	Selected bool
-}
-
 type UI struct {
 	app fyne.App
 	win fyne.Window
 
-	lstFiles *widget.List
+	lstFiles  *widget.List
+	bindFiles binding.StringList
+
+	frmTags *widget.Form
 
 	yd       *yaatt.YaattData
-	TheFiles []TheFile
+	TheFiles []*fileutils.TheFile
 
 	bindFileHeader binding.String
 }
@@ -36,7 +32,8 @@ type UI struct {
 func InitGui(args []string) {
 	var err error
 	ui := &UI{
-		TheFiles:       []TheFile{},
+		TheFiles:       []*fileutils.TheFile{},
+		bindFiles:      binding.NewStringList(),
 		bindFileHeader: binding.NewString(),
 	}
 
@@ -49,9 +46,8 @@ func InitGui(args []string) {
 			// dialog.ShowError(err, ui.win)
 			log.Warn().Msgf("%v", err)
 		}
-		ui.TheFiles = MakeTheFileList(ui.yd.Files)
+		ui.TheFiles = fileutils.NewTheFileList(ui.yd.Files)
 		ui.bindFileHeader.Set(fmt.Sprintf("Files (%d)", len(ui.TheFiles)))
-
 	}
 
 	// var err error
@@ -99,29 +95,4 @@ func InitGui(args []string) {
 	ui.win.Resize(fyne.NewSize(1024, 768))
 	ui.win.CenterOnScreen()
 	ui.win.ShowAndRun()
-}
-
-func MakeTheFile(fp string) TheFile {
-	return TheFile{
-		Path:     fp,
-		Name:     filepath.Base(fp),
-		Dir:      filepath.Dir(fp),
-		Selected: false,
-	}
-}
-
-func MakeTheFileList(fps []string) []TheFile {
-	lst := []TheFile{}
-	for _, fp := range fps {
-		lst = append(lst, MakeTheFile(fp))
-	}
-	return lst
-}
-
-func MakeFilenameList(tfs []TheFile) []string {
-	lst := []string{}
-	for _, tf := range tfs {
-		lst = append(lst, tf.Name)
-	}
-	return lst
 }

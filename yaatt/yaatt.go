@@ -6,9 +6,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"beckx.online/butils/fileutils"
 	"github.com/rs/zerolog/log"
+)
+
+const (
+	TAG_SEP = "||"
 )
 
 type TagMap struct {
@@ -114,6 +119,59 @@ func (yd YaattData) PrintMetadata() string {
 		}
 	}
 	return txt
+}
+
+func (yd YaattData) GetTextTags(files []string) [][]string {
+	rec := [][]string{}
+	tagnameorder := []string{}
+	m := make(map[string][]string)
+	for _, file := range files {
+		md, ok := yd.MetaDatas[file]
+		if !ok {
+			continue
+		}
+		for _, tagname := range md.TextTagIndex {
+			if !isInList(tagnameorder, tagname) {
+				tagnameorder = append(tagnameorder, tagname)
+			}
+			tagvals, ok := m[tagname]
+			curTagvals := GetTagValues(md.TextTags[tagname])
+			if ok {
+				if !isInList(tagvals, curTagvals) {
+					m[tagname] = append(m[tagname], curTagvals)
+				}
+			} else {
+				m[tagname] = []string{curTagvals}
+			}
+		}
+	}
+	for _, tn := range tagnameorder {
+		rec = append(rec, []string{
+			tn, strings.Join(m[tn], TAG_SEP),
+		})
+	}
+	return rec
+}
+
+func isInList(l []string, val string) bool {
+	for _, el := range l {
+		if el == val {
+			return true
+		}
+	}
+	return false
+}
+
+func isValInCol(rec [][]string, col int, val string) (int, bool) {
+	for i, row := range rec {
+		if len(row) <= col {
+			return -1, false
+		}
+		if row[col] == val {
+			return i, true
+		}
+	}
+	return -1, false
 }
 
 // CollectTextTagNames walks throu the read in MetaDatas and returns a map

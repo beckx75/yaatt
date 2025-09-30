@@ -9,36 +9,39 @@ import (
 )
 
 func (ui *UI) initUiTagging() *fyne.Container {
-	tags := []string{
-		"TAG-NAME",
-		"artist", "album", "albartist",
-		"cdnum", "tracknum", "year",
-		"title", "genre", "comment",
-	}
+	// frmItems := []*widget.FormItem{}
+	lblTags := widget.NewLabel("Tag's...")
+	lblTags.Alignment = fyne.TextAlignCenter
+	lblTags.TextStyle.Bold = true
 
-	frmItems := []*widget.FormItem{}
-
-	frmTags := widget.NewForm()
-	for _, tn := range tags {
-		frmItems = append(frmItems, widget.NewFormItem(tn, widget.NewEntry()))
-	}
-	frmTags.Items = frmItems
+	ui.frmTags = widget.NewForm()
+	// for _, tn := range []string{} {
+	// 	frmItems = append(frmItems, widget.NewFormItem(tn, widget.NewEntry()))
+	// }
+	// ui.frmTags.Items = frmItems
 
 	btnTest := widget.NewButton("Test...", func() {
-		for _, frmItem := range frmItems {
-			fmt.Println(frmItem.Widget.(*widget.Entry).Text)
-		}
 	})
 
-	return container.NewBorder(nil, btnTest, nil, nil,
-		frmTags,
+	return container.NewBorder(lblTags, btnTest, nil, nil,
+		ui.frmTags,
 	)
 }
 
-func (ui *UI) RefreshTags() {
+func (ui *UI) RefreshTagView(tags [][]string) {
+	fmt.Println(tags)
 	// save current tags
-
 	// clear ui
+	frmItems := []*widget.FormItem{}
+	ui.frmTags.Items = frmItems
+	ui.frmTags.Refresh()
+	for _, tagsRow := range tags {
+		entry := widget.NewEntry()
+		entry.Text = tagsRow[1]
+		frmItems = append(frmItems, widget.NewFormItem(tagsRow[0], entry))
+	}
+	ui.frmTags.Items = frmItems
+	ui.frmTags.Refresh()
 	// insert new tags
 	// refresh gui
 }

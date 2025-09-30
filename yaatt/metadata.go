@@ -60,6 +60,14 @@ type MetaData struct {
 	Pics         []*Pic
 }
 
+func GetTagValues(tts []*TextTag) string {
+	vals := []string{}
+	for _, tt := range tts {
+		vals = append(vals, tt.Value)
+	}
+	return strings.Join(vals, TAG_SEP)
+}
+
 func ReadMetadata(fp string, tm TagMap) (*MetaData, error) {
 	md := &MetaData{
 		TextTags:     make(map[string][]*TextTag),

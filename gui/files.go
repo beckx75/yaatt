@@ -4,41 +4,28 @@ import (
 	"beckx.online/butils/fileutils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 )
 
 func (ui *UI) initUiFiles() *fyne.Container {
-	// ui.lstFiles = widget.NewList(
-	// 	func() int {
-	// 		return len(ui.TheFiles)
-	// 	},
-	// 	func() fyne.CanvasObject {
-	// 		return widget.NewLabel("template")
-	// 	},
-	// 	func(i widget.ListItemID, o fyne.CanvasObject) {
-	// 		lbl := o.(*widget.Label)
-	// 		lbl.TextStyle.Bold = ui.TheFiles[i].Selected
-	// 		lbl.SetText(ui.TheFiles[i].Name)
-	// 	})
-	ui.lstFiles = widget.NewListWithData(
-		ui.bindFiles,
+	ui.lstFiles = widget.NewList(
+		func() int {
+			return len(ui.TheFiles)
+		},
 		func() fyne.CanvasObject {
 			return widget.NewLabel("template")
 		},
-		func(i binding.DataItem, o fyne.CanvasObject) {
+		func(i widget.ListItemID, o fyne.CanvasObject) {
 			lbl := o.(*widget.Label)
-			lbl.TextStyle.Bold = ui.TheFiles[i.(int)].Selected
-			lbl.Bind(i.(binding.String))
-		},
-	)
+			lbl.TextStyle.Bold = ui.TheFiles[i].Selected
+			lbl.SetText(ui.TheFiles[i].Name)
+		})
 	ui.lstFiles.OnSelected = func(id widget.ListItemID) {
 		// save current tagitems-data
 		// TODO SAVE DATA..
 
 		ui.TheFiles[id].Selected = !ui.TheFiles[id].Selected
-		ui.lstFiles.
-			ui.lstFiles.UnselectAll()
+		ui.lstFiles.UnselectAll()
 		ui.lstFiles.Refresh()
 		// clear tagitems-view
 		// get new selected file tagitems
@@ -59,15 +46,45 @@ func (ui *UI) makeFilesHeader() *fyne.Container {
 	lblFileheader.TextStyle.Bold = true
 	lblFileheader.Alignment = fyne.TextAlignCenter
 
-	btnSelectAllFiles := widget.NewButton("select all", func() {
-		for i, tf := range ui.TheFiles {
-			tf.Selected = true
-			ui.lstFiles.Select(i)
+	var btnSelectAllFiles *widget.Button
+	btnSelectAllFiles = widget.NewButton("select all", func() {
+		if !ui.selectAllButtonPressed {
+			for i, tf := range ui.TheFiles {
+				tf.Selected = true
+				ui.lstFiles.Select(i)
+				ui.lstFiles.OnSelected(i)
+			}
+			ui.lstFiles.UnselectAll()
+			ui.lstFiles.Refresh()
+			ui.selectAllButtonPressed = true
+			btnSelectAllFiles.Text = "de-select all"
+			btnSelectAllFiles.Refresh()
+		} else {
+			// deselect everything
+			for i, tf := range ui.TheFiles {
+				tf.Selected = false
+				ui.lstFiles.Select(i)
+				ui.lstFiles.OnSelected(i)
+			}
+			ui.lstFiles.UnselectAll()
+			ui.lstFiles.Refresh()
+			ui.selectAllButtonPressed = false
+			btnSelectAllFiles.Text = "select all"
+			btnSelectAllFiles.Refresh()
 		}
-		ui.lstFiles.UnselectAll()
-		ui.lstFiles.Refresh()
 		// NEXT update lstFiles with all files selected
 	})
 
-	return container.NewVBox(lblFileheader, btnSelectAllFiles)
+	var btnInverseSelection *widget.Button
+	btnInverseSelection = widget.NewButton("inverse selection", func() {
+		for i, tf := range ui.TheFiles {
+			tf.Selected = !tf.Selected
+			ui.lstFiles.Select(i)
+			ui.lstFiles.OnSelected(i)
+		}
+		ui.lstFiles.UnselectAll()
+		ui.lstFiles.Refresh()
+	})
+	return container.NewVBox(lblFileheader,
+		container.NewHBox(btnSelectAllFiles, btnInverseSelection))
 }

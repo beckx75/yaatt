@@ -1,8 +1,6 @@
 package gui
 
 import (
-	"fmt"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
@@ -29,7 +27,7 @@ func (ui *UI) initUiTagging() *fyne.Container {
 }
 
 func (ui *UI) RefreshTagView(tags [][]string) {
-	fmt.Println(tags)
+	// fmt.Println(tags)
 	// save current tags
 	// clear ui
 	frmItems := []*widget.FormItem{}

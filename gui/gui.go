@@ -27,6 +27,8 @@ type UI struct {
 	TheFiles []*fileutils.TheFile
 
 	bindFileHeader binding.String
+
+	selectAllButtonPressed bool
 }
 
 func InitGui(args []string) {

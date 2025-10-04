@@ -4,6 +4,8 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+
 	"beckx.online/yaatt/yaatt"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -20,10 +22,31 @@ var writeCmd = &cobra.Command{
 			log.Error().Msgf("%v", err)
 		}
 
-		err = yaatt.WriteMetadata(yd.Files[0], *yd.Tagmap)
-		if err != nil {
-			log.Error().Msgf("%v", err)
+		tts, ok := yd.MetaDatas[yd.Files[0]].TextTags["Title"]
+		if ok {
+			fmt.Println(tts[0].Value)
+			tts[0].Value = "Reverse"
+		} else {
+			yd.MetaDatas[yd.Files[0]].TextTags["Title"] = []*yaatt.TextTag{
+				{OrgName: "TIT2", Value: "Sepps Song"},
+			}
 		}
+		tts, ok = yd.MetaDatas[yd.Files[0]].TextTags["Album"]
+		if ok {
+			fmt.Println(tts[0].Value)
+			tts[0].Value = "Album Reverse"
+		} else {
+			yd.MetaDatas[yd.Files[0]].TextTags["Album"] = []*yaatt.TextTag{
+				{OrgName: "TALB", Value: "An Sepp sei Album"},
+			}
+		}
+		for fp, md := range yd.MetaDatas {
+			err = md.WriteMetadata(fp, *yd.Tagmap)
+			if err != nil {
+				log.Error().Msgf("%v", err)
+			}
+		}
+
 	},
 }
 

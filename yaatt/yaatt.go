@@ -122,6 +122,7 @@ func (yd YaattData) PrintMetadata() string {
 }
 
 func (yd YaattData) GetTextTags(files []string) [][]string {
+	log.Debug().Msgf("getting text-tags fpr files %v", files)
 	rec := [][]string{}
 	tagnameorder := []string{}
 	m := make(map[string][]string)

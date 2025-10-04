@@ -23,7 +23,6 @@ func (ui *UI) initUiFiles() *fyne.Container {
 	ui.lstFiles.OnSelected = func(id widget.ListItemID) {
 		// save current tagitems-data
 		// TODO SAVE DATA..
-
 		ui.TheFiles[id].Selected = !ui.TheFiles[id].Selected
 		ui.lstFiles.UnselectAll()
 		ui.lstFiles.Refresh()

@@ -321,23 +321,37 @@ func getTagType(fp string) (TagType, error) {
 func (md MetaData) WriteMetadata(fp string, tm TagMap) error {
 	switch md.TagType {
 	case TT_ID3V23:
-		return md.writeMetadataId3v23(fp, tm)
+		return md.writeIdv23Metadata(fp, tm)
 	case TT_VORBIS:
 		return fmt.Errorf("not supported yet...")
 	}
+
+	return nil
+}
+
+func (md MetaData) writeIdv23Metadata(fp string, tm TagMap) error {
 	tag := id3v2.NewEmptyTag()
 	tag.SetVersion(3)
-	tag.AddTextFrame("TALB", id3v2.EncodingISO, "Sepps Album")
-
+	for _, tts := range md.TextTags {
+		for _, tt := range tts {
+			if tt.OrgName == "COMM" {
+			} else if tt.OrgName == "TXXX" {
+				tag.AddUserDefinedTextFrame(id3v2.UserDefinedTextFrame{
+					Encoding:    id3v2.EncodingISO,
+					Description: tt.Name,
+					Value:       tt.Value,
+				})
+			} else if tt.OrgName[0] == 'T' {
+				tag.AddTextFrame(tt.OrgName, id3v2.EncodingISO, tt.Value)
+			} else {
+				log.Warn().Msgf("frame with currently not supported %s", tt.OrgName)
+			}
+		}
+	}
 	f, err := os.OpenFile(fp, os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	_, err = tag.WriteTo(f)
 	return err
-}
-
-func (md MetaData) writeMetadataId3v23(fp string, tm TagMap) error {
-
-	return nil
 }

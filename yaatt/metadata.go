@@ -317,3 +317,27 @@ func getTagType(fp string) (TagType, error) {
 		}
 	}
 }
+
+func (md MetaData) WriteMetadata(fp string, tm TagMap) error {
+	switch md.TagType {
+	case TT_ID3V23:
+		return md.writeMetadataId3v23(fp, tm)
+	case TT_VORBIS:
+		return fmt.Errorf("not supported yet...")
+	}
+	tag := id3v2.NewEmptyTag()
+	tag.SetVersion(3)
+	tag.AddTextFrame("TALB", id3v2.EncodingISO, "Sepps Album")
+
+	f, err := os.OpenFile(fp, os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	_, err = tag.WriteTo(f)
+	return err
+}
+
+func (md MetaData) writeMetadataId3v23(fp string, tm TagMap) error {
+
+	return nil
+}

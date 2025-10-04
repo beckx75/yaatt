@@ -52,7 +52,7 @@ func NewYaattData(args []string, confpath string) (*YaattData, error) {
 		if err != nil {
 			errs = errors.Join(errs, err)
 		} else {
-			log.Debug().Msgf("Read file", i+1, fp)
+			log.Debug().Msgf("Read file %d: %s", i+1, fp)
 			yd.MetaDatas[fp] = md
 		}
 	}

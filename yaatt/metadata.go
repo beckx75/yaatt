@@ -65,7 +65,7 @@ func GetTagValues(tts []*TextTag) string {
 	for _, tt := range tts {
 		vals = append(vals, tt.Value)
 	}
-	return strings.Join(vals, TAG_SEP)
+	return strings.Join(vals, SEP_TAGVAL)
 }
 
 func ReadMetadata(fp string, tm TagMap) (*MetaData, error) {
@@ -96,7 +96,9 @@ func ReadMetadata(fp string, tm TagMap) (*MetaData, error) {
 			return nil, err
 		}
 	case TT_NOTAG:
-		return nil, fmt.Errorf("file is mp3-file and has no ID3v2x Tag: %s", fp)
+		// not tag -> create dummy yaatt-ID3v23 Tag
+		md.makeId3v23DefaultTags(fp, tm)
+		log.Warn().Msgf("file is mp3-file and has no ID3v2x Tag: %s", fp)
 	case TT_UNDEF:
 		return nil, fmt.Errorf("could not read metadata because of unknown TagType in '%s': %v",
 			fp, md.TagType)
@@ -142,6 +144,15 @@ func (md *MetaData) readVorbisMetadata(fp string, tm TagMap) error {
 	}
 
 	return nil
+}
+
+func (md *MetaData) makeId3v23DefaultTags(fp string, tm TagMap) {
+	for k, v := range tm.YaatToId323 {
+		md.TextTagIndex = append(md.TextTagIndex, k)
+		md.TextTags[k] = []*TextTag{
+			{OrgName: v, Name: k, Value: ""},
+		}
+	}
 }
 
 func (md *MetaData) readId3v2Metadata(fp string, tm TagMap) error {

@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	TAG_SEP = "||"
+	SEP_TAGVAL  = ",-'"
+	SEP_TAGNAME = "||"
 )
 
 type TagMap struct {
@@ -122,7 +123,7 @@ func (yd YaattData) PrintMetadata() string {
 }
 
 func (yd YaattData) GetTextTags(files []string) [][]string {
-	log.Debug().Msgf("getting text-tags fpr files %v", files)
+	log.Debug().Msgf("getting text-tags for files %v", files)
 	rec := [][]string{}
 	tagnameorder := []string{}
 	m := make(map[string][]string)
@@ -148,7 +149,7 @@ func (yd YaattData) GetTextTags(files []string) [][]string {
 	}
 	for _, tn := range tagnameorder {
 		rec = append(rec, []string{
-			tn, strings.Join(m[tn], TAG_SEP),
+			tn, strings.Join(m[tn], SEP_TAGNAME),
 		})
 	}
 	return rec

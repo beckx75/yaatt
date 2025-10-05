@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	"beckx.online/butils/fileutils"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -23,6 +25,9 @@ func (ui *UI) initUiFiles() *fyne.Container {
 	ui.lstFiles.OnSelected = func(id widget.ListItemID) {
 		// save current tagitems-data
 		// TODO SAVE DATA..
+		for _, fitem := range ui.frmTags.Items {
+			fmt.Println(fitem.Text, ": ", fitem.Widget.(*enterEntry).Text)
+		}
 		ui.TheFiles[id].Selected = !ui.TheFiles[id].Selected
 		ui.lstFiles.UnselectAll()
 		ui.lstFiles.Refresh()

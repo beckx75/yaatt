@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	SEP_TAGVAL  = ",-'"
-	SEP_TAGNAME = "||"
+	SEP_TAGVAL  = "||"
+	SEP_TAGNAME = ";'"
 )
 
 type TagMap struct {
@@ -122,6 +122,17 @@ func (yd YaattData) PrintMetadata() string {
 	return txt
 }
 
+func (yd YaattData) WriteMetadata() error {
+	var err error
+	for fp, md := range yd.MetaDatas {
+		err = md.WriteMetadata(fp, *yd.Tagmap)
+		if err != nil {
+			log.Error().Msgf("%v", err)
+		}
+	}
+	return nil
+}
+
 func (yd YaattData) GetTextTags(files []string) [][]string {
 	log.Debug().Msgf("getting text-tags for files %v", files)
 	rec := [][]string{}
@@ -149,7 +160,7 @@ func (yd YaattData) GetTextTags(files []string) [][]string {
 	}
 	for _, tn := range tagnameorder {
 		rec = append(rec, []string{
-			tn, strings.Join(m[tn], SEP_TAGNAME),
+			tn, strings.Join(m[tn], SEP_TAGVAL),
 		})
 	}
 	return rec

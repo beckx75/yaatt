@@ -27,8 +27,6 @@ type UI struct {
 	TheFiles []*fileutils.TheFile
 
 	bindFileHeader binding.String
-
-	selectAllButtonPressed bool
 }
 
 func InitGui(args []string) {
@@ -76,6 +74,8 @@ func InitGui(args []string) {
 	)
 
 	btnQuit := widget.NewButtonWithIcon("i'm done...", theme.HomeIcon(), func() {
+		fmt.Println("ja druggd der Sauhund des überhaupt aus?")
+		fmt.Println(ui.yd.PrintMetadata())
 		ui.app.Quit()
 	})
 

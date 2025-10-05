@@ -5,6 +5,8 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -30,8 +32,14 @@ func (ui *UI) initUiTagging() *fyne.Container {
 	// }
 	// ui.frmTags.Items = frmItems
 
-	btnTest := widget.NewButton("Test...", func() {
-	})
+	btnTest := widget.NewButtonWithIcon("Save",
+		theme.DocumentSaveIcon(), func() {
+			ui.inheritTags()
+			err := ui.yd.WriteMetadata()
+			if err != nil {
+				dialog.ShowError(err, ui.win)
+			}
+		})
 
 	return container.NewBorder(lblTags, btnTest, nil, nil,
 		ui.frmTags,
